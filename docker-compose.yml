@@ -2,38 +2,28 @@ version: '3'
 services:
   nginx:
     build:
-      context: .docker/development
+      context: .docker
       dockerfile: nginx.docker
     volumes:
       - ./:/app:cached
     depends_on:
-      - manager-php-fpm
+      - php-fpm
     ports:
-      - "80:80"
-      - "8099:80"
-    networks:
-      - internal2
+      - "8081:80"
   php-fpm:
     build:
-      context: .docker/development
+      context: .docker
       dockerfile: php-fpm.docker
     volumes:
       - ./:/app:cached
-    environment:
-      XDEBUG_CONFIG: "remote_host=192.168.220.1 remote_enable=1"
-      PHP_IDE_CONFIG: "serverName=Docker"
-    networks:
-      - internal2
   php-cli:
     build:
-      context: .docker/development
+      context: .docker
       dockerfile: php-cli.docker
     volumes:
       - ./:/app:cached
       - composer:/root/.composer/cache
     tty: true
-    networks:
-      - internal2
   postgre:
     image: postgres:11.2-alpine
     volumes:
@@ -42,9 +32,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "54324:5432"
-    networks:
-      - internal2
+      - "54321:5432"
   node:
     image: node:12.7-alpine
     volumes:
@@ -61,4 +49,4 @@ services:
       - "8082:15672"
       - "5672:5672"
     volumes:
-      - .docker/development/rabbit/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - .docker/rabbit/enabled_plugins:/etc/rabbitmq/enabled_plugins

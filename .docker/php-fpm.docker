@@ -1,0 +1,25 @@
+FROM php:7.3-fpm
+
+RUN pecl install -o -f xdebug redis \
+    && rm -rf /tmp/pear \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-install bcmath \
+    && docker-php-ext-install sockets
+
+RUN apt-get update && apt-get install -y libpq-dev curl wget gnupg \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && echo "zend_extension = opcache.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "zend_extension = xdebug.so" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_port=9000" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.idekey=docker" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_host=192.168.17.1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && rm -rf /tmp/* \
+
+COPY ./php/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+WORKDIR /app
