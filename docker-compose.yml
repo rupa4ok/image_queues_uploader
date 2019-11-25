@@ -22,12 +22,12 @@ services:
       dockerfile: php-cli.docker
     volumes:
       - ./:/app:cached
-      - composer:/root/.composer/cache
+      - composer1:/root/.composer/cache1
     tty: true
-  postgre:
+  postgres1:
     image: postgres:11.2-alpine
     volumes:
-      - manager-postgre:/var/lib/postgresql/data
+      - postgres1:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -50,3 +50,6 @@ services:
       - "5672:5672"
     volumes:
       - .docker/rabbit/enabled_plugins:/etc/rabbitmq/enabled_plugins
+volumes:
+  postgres1:
+  composer1:
